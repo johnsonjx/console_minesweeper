@@ -206,6 +206,29 @@ int TileOptions()
 	return optionChosen;
 }
 
+void SetChosenTileInteraction(int optionChosen, ETileInteractions& ChosenTileInteraction)
+{
+	switch (optionChosen)
+	{
+	case 1:
+		ChosenTileInteraction = ETileInteractions::ETI_Reveal;
+
+		break;
+	case 2:
+		ChosenTileInteraction = ETileInteractions::ETI_Highlight;
+
+		break;
+	case 3:
+		ChosenTileInteraction = ETileInteractions::ETI_Flag;
+
+		break;
+	case 4:
+		ChosenTileInteraction = ETileInteractions::ETI_Restart;
+
+		break;
+	}
+}
+
 void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile& tileInput, int rows, int columns, int bombs, Minefield::Tile* boardOver[], int indicesLeft, int indicesBottom, int& safeTiles, bool& overViaBomb, bool& overViaWin, bool& overViaRestart)
 {
 	if (tileIndexROW >= rows || tileIndexCOLUMN >= columns)
@@ -237,11 +260,14 @@ void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile& til
 			}
 		}
 
+		// Declaration and initialization of enum instance
+		ETileInteractions ChosenTileInteraction;
+		SetChosenTileInteraction(TileOptions(), ChosenTileInteraction);
 
-		// Affect selected tile depending on input
-		switch (TileOptions())
+		// Affect selected tile depending on player's choice
+		switch (ChosenTileInteraction)
 		{
-		case 1:
+		case ETileInteractions::ETI_Reveal:
 			// Reveal | This area will change the tile to the number of nearby bombs
 			boardOver[tileIndexROW][tileIndexCOLUMN].SetTileValue(NULL);
 			boardOver[tileIndexROW][tileIndexCOLUMN].SetRevealedValue(nearbyBombs);
@@ -252,7 +278,7 @@ void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile& til
 			SafeTileCheck(rows, columns, boardOver, safeTiles, overViaWin);
 
 			break;
-		case 2:
+		case ETileInteractions::ETI_Highlight:
 			// Highlight | Turns char to letter H
 			if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tileInput.GetTileValue())
 			{
@@ -268,7 +294,7 @@ void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile& til
 			}
 
 			break;
-		case 3:
+		case ETileInteractions::ETI_Flag:
 			// Flag | Turns tileValue to letter B if it isn't that already, otherwise turns it back into 'x'
 			if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tileInput.GetTileValue())
 			{
@@ -284,7 +310,7 @@ void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile& til
 			}
 
 			break;
-		case 4:
+		case ETileInteractions::ETI_Restart:
 			// Restart Game Option
 			overViaRestart = true;
 

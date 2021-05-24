@@ -4,7 +4,7 @@ C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johns
   Generating Code...
 C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johnson_minesweeper\GameFunctions.cpp(184): warning C4715: 'SelectTile': not all control paths return a value
 C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johnson_minesweeper\GameFunctions.cpp(176): warning C4172: returning address of local variable or temporary: tileChoices
-C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johnson_minesweeper\GameFunctions.cpp(310): warning C4715: 'BombCheck': not all control paths return a value
-C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johnson_minesweeper\GameFunctions.cpp(354): warning C4715: 'GameOver': not all control paths return a value
-C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johnson_minesweeper\GameFunctions.cpp(385): warning C4715: 'GameComplete': not all control paths return a value
+C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johnson_minesweeper\GameFunctions.cpp(336): warning C4715: 'BombCheck': not all control paths return a value
+C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johnson_minesweeper\GameFunctions.cpp(380): warning C4715: 'GameOver': not all control paths return a value
+C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johnson_minesweeper\GameFunctions.cpp(411): warning C4715: 'GameComplete': not all control paths return a value
   johnson_minesweeper.vcxproj -> C:\Users\Super\OneDrive\old\Documents\programming_work\console_minesweeper\johnson_minesweeper\Debug\johnson_minesweeper.exe

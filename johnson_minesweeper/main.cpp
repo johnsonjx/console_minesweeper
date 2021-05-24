@@ -49,7 +49,6 @@ int main()
 		// This area allots space for tiles
 		// Dynamic memory allocation was necessary, along with a different method of creating/sizing the 2D Array.
 		// REMINDER: Make sure to use "delete" (with loop) later to prevent memory leaks!!
-
 		Minefield::Tile** boardOver = new Minefield::Tile * [rows];
 		for (int i = 0; i < rows; i++)
 		{
