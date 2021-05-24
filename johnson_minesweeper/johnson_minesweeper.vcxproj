@@ -139,10 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameFunctions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Minefield.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameFunctions.h" />
     <ClInclude Include="Minefield.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
