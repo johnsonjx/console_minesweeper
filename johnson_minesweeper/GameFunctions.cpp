@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include <ctime>
 #include <cstdlib>
 #include <algorithm>
@@ -10,6 +9,56 @@ void GreetPlayer()
 {
 	std::cout << "\t\t***Welcome to Minesweeper! Clear the field to win the game. You got this, soldier!***\n";
 	std::cout << "\n\n";
+}
+
+void PromptPlayerForBoardSize(int& rows, int& columns, int& bombs)
+{
+	do
+	{
+		std::cout << "ROWS: ";
+		std::cin >> rows;
+		std::cout << "COLUMNS: ";
+		std::cin >> columns;
+
+		if (rows < 2 && columns < 2)
+		{
+			std::cout << "\nIncrease either row or column amount.\n";
+		}
+	} while (rows < 2 && columns < 2);
+
+	do
+	{
+		std::cout << "BOMBS: ";
+		std::cin >> bombs;
+		if (bombs >= (rows * columns))
+		{
+			std::cout << "\nToo many bombs. This is a game, not a suicide.\n";
+		}
+	} while (bombs >= (rows * columns));
+
+	std::cout << "\nThe bombs are set. Good luck!" << "\n";
+}
+
+void InitializeGameBoard(int rows, int columns, Minefield::Tile tile, Minefield::Tile* boardOver[])
+{
+	// This area allots space for tiles
+	// Dynamic memory allocation's how we create the 2D Array.
+	// REMINDER: Make sure to use "delete" (with loop) later to prevent memory leaks!!
+	for (int i = 0; i < rows; i++)
+	{
+		boardOver[i] = new Minefield::Tile[columns];
+	}
+
+	// This area iterates through our dynamic 2D array and places a Tile object in each slot
+	// Also sets default state of each tile
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < columns; j++)
+		{
+			boardOver[i][j] = tile;
+			boardOver[i][j].SetState(Minefield::Tile::State::Hidden);
+		}
+	}
 }
 
 void PlaceBombs(int rows, int columns, int bombs, Minefield::Tile* boardOver[])
@@ -87,7 +136,7 @@ void PlaceBombs(int rows, int columns, int bombs, Minefield::Tile* boardOver[])
 	}
 }
 
-void OutputGameBoard(Minefield::Tile& tileInput, int rows, int columns, int bombs, Minefield::Tile* boardOver[], int indicesLeft, int indicesBottom, bool& overViaBomb, bool& overViaWin)
+void OutputGameBoard(int rows, int columns, int bombs, Minefield::Tile* boardOver[], int indicesLeft, int indicesBottom, bool& overViaBomb, bool& overViaWin)
 {
 	// Exposes all bomb positions upon ending game
 	// For debugging, take out of the first "if" check to see bombs immediately
@@ -148,21 +197,21 @@ void OutputGameBoard(Minefield::Tile& tileInput, int rows, int columns, int bomb
 	std::cout << "\n\n";
 }
 
-int* SelectTile()
+void SelectTile(FPlayerTileChoiceIndex& TileChoiceIndex)
 {
-	int playerInputROW;
-	int playerInputCOLUMN;
+	int playerInputRow;
+	int playerInputColumn;
 	char playerChoice;
-	int tileChoices[2];
+
 	do
 	{
 		playerChoice = '\0';
 
 		std::cout << "Please select the tile you want by typing the row (number from the left) then column (number from the bottom).\n";
 		std::cout << "ROW: ";
-		std::cin >> playerInputROW;
+		std::cin >> playerInputRow;
 		std::cout << "COLUMN: ";
-		std::cin >> playerInputCOLUMN;
+		std::cin >> playerInputColumn;
 
 		std::cout << "Is that the tile you want to select? (type 'y' for yes or 'n' for no)\n";
 		std::cin >> playerChoice;
@@ -170,15 +219,15 @@ int* SelectTile()
 		if (playerChoice == 'y')
 		{
 			// The "minus ones" here give us accurate 1 to 1 indexing with the in-game board indices.
-			tileChoices[0] = playerInputROW - 1;
-			tileChoices[1] = playerInputCOLUMN - 1;
+			TileChoiceIndex.playerRowChoice = playerInputRow - 1;
+			TileChoiceIndex.playerColumnChoice = playerInputColumn - 1;
 
-			return tileChoices;
+			return;
 		}
 		else if (playerChoice != 'y')
 		{
-			playerInputROW = NULL;
-			playerInputCOLUMN = NULL;
+			playerInputRow = NULL;
+			playerInputColumn = NULL;
 		}
 	} while (playerChoice != 'y');
 }
@@ -229,7 +278,7 @@ void SetChosenTileInteraction(int optionChosen, ETileInteractions& ChosenTileInt
 	}
 }
 
-void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile& tileInput, int rows, int columns, int bombs, Minefield::Tile* boardOver[], int indicesLeft, int indicesBottom, int& safeTiles, bool& overViaBomb, bool& overViaWin, bool& overViaRestart)
+void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile tile, int rows, int columns, int bombs, Minefield::Tile* boardOver[], int indicesLeft, int indicesBottom, int& safeTiles, bool& overViaBomb, bool& overViaWin, bool& overViaRestart)
 {
 	if (tileIndexROW >= rows || tileIndexCOLUMN >= columns)
 	{
@@ -280,13 +329,13 @@ void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile& til
 			break;
 		case ETileInteractions::ETI_Highlight:
 			// Highlight | Turns char to letter H
-			if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tileInput.GetTileValue())
+			if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tile.GetTileValue())
 			{
-				boardOver[tileIndexROW][tileIndexCOLUMN].SetTileValue(tileInput.GetHighlightedValue());
+				boardOver[tileIndexROW][tileIndexCOLUMN].SetTileValue(tile.GetHighlightedValue());
 			}
-			else if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tileInput.GetHighlightedValue())
+			else if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tile.GetHighlightedValue())
 			{
-				boardOver[tileIndexROW][tileIndexCOLUMN].SetTileValue(tileInput.GetTileValue());
+				boardOver[tileIndexROW][tileIndexCOLUMN].SetTileValue(tile.GetTileValue());
 			}
 			else if (boardOver[tileIndexROW][tileIndexCOLUMN].GetState() == Minefield::Tile::State::Revealed)
 			{
@@ -296,13 +345,13 @@ void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile& til
 			break;
 		case ETileInteractions::ETI_Flag:
 			// Flag | Turns tileValue to letter B if it isn't that already, otherwise turns it back into 'x'
-			if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tileInput.GetTileValue())
+			if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tile.GetTileValue())
 			{
-				boardOver[tileIndexROW][tileIndexCOLUMN].SetTileValue(tileInput.GetFlaggedValue());
+				boardOver[tileIndexROW][tileIndexCOLUMN].SetTileValue(tile.GetFlaggedValue());
 			}
-			else if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tileInput.GetFlaggedValue())
+			else if (boardOver[tileIndexROW][tileIndexCOLUMN].GetTileValue() == tile.GetFlaggedValue())
 			{
-				boardOver[tileIndexROW][tileIndexCOLUMN].SetTileValue(tileInput.GetTileValue());
+				boardOver[tileIndexROW][tileIndexCOLUMN].SetTileValue(tile.GetTileValue());
 			}
 			else if (boardOver[tileIndexROW][tileIndexCOLUMN].GetState() == Minefield::Tile::State::Revealed)
 			{
@@ -318,7 +367,7 @@ void UpdateGameBoard(int tileIndexROW, int tileIndexCOLUMN, Minefield::Tile& til
 		}
 	}
 
-	OutputGameBoard(tileInput, rows, columns, bombs, boardOver, indicesLeft, indicesBottom, overViaBomb, overViaWin);
+	OutputGameBoard(rows, columns, bombs, boardOver, indicesLeft, indicesBottom, overViaBomb, overViaWin);
 }
 
 bool BombCheck(int& tileIndexROW, int& tileIndexCOLUMN, Minefield::Tile* boardOver[], bool& overViaBomb)
@@ -408,4 +457,14 @@ bool GameComplete(bool& gameComplete, bool& gameRestart)
 			std::cout << "Invalid option!\n";
 		}
 	} while (playerChoice != 1 && playerChoice != 2);
+}
+
+void ClearBoardMemory(int& rows, Minefield::Tile* boardOver[])
+{
+	// CLEAR DYNAMIC MEMORY/MINEFIELD
+	for (int i = 0; i < rows; i++)
+	{
+		delete[] boardOver[i];
+	}
+	delete[] boardOver;
 }
